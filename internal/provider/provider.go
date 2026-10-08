@@ -95,6 +95,7 @@ func (p *DirectusProvider) Configure(ctx context.Context, req provider.Configure
 func (p *DirectusProvider) Resources(_ context.Context) []func() resource.Resource {
 	return []func() resource.Resource{
 		NewCollectionResource,
+		NewFieldResource,
 		NewFolderResource,
 	}
 }
