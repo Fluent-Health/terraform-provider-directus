@@ -1,0 +1,43 @@
+# Disposable Directus for the acceptance suite (make testacc / CI).
+#
+# Runs UNLICENSED Core: no LICENSE_KEY, and the suite stays within Core's
+# limits (no licensed features, few collections). A licence activation binds to
+# key + PUBLIC_URL + project_id and cannot be released through the API, so a
+# per-run activation would burn a slot every CI run.
+services:
+  postgres:
+    image: postgres:16
+    environment:
+      POSTGRES_USER: directus
+      POSTGRES_PASSWORD: directus
+      POSTGRES_DB: directus
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U directus"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+  directus:
+    image: directus/directus:12.4.1
+    depends_on:
+      postgres:
+        condition: service_healthy
+    ports:
+      - "8055:8055"
+    environment:
+      KEY: acceptance-key
+      SECRET: acceptance-secret-not-for-production
+      PUBLIC_URL: http://localhost:8055
+      DB_CLIENT: pg
+      DB_HOST: postgres
+      DB_PORT: "5432"
+      DB_DATABASE: directus
+      DB_USER: directus
+      DB_PASSWORD: directus
+      # Bootstrap creates this admin; ADMIN_TOKEN becomes its static token,
+      # which is what the provider authenticates with (DIRECTUS_TOKEN).
+      ADMIN_EMAIL: admin@example.com
+      ADMIN_PASSWORD: acceptance-admin
+      ADMIN_TOKEN: acceptance-admin-token
+      # Schema reads must see writes made moments earlier by the same suite.
+      CACHE_SCHEMA: "false"
+      TELEMETRY: "false"

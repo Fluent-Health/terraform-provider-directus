@@ -1,0 +1,18 @@
+apiVersion: backstage.io/v1alpha1
+kind: Component
+metadata:
+  name: terraform-provider-directus
+  title: Terraform Provider for Directus
+  description: Terraform provider for managing Directus configuration (schema, access control, folders, flows, dashboards, settings).
+  annotations:
+    github.com/project-slug: Fluent-Health/terraform-provider-directus
+    backstage.io/source-location: url:https://github.com/Fluent-Health/terraform-provider-directus/tree/main/
+    fluentinhealth.com/oss: pending
+  tags:
+    - terraform
+    - directus
+    - opensource
+spec:
+  type: library
+  lifecycle: experimental
+  owner: group:default/devops
