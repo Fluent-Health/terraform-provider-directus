@@ -1,0 +1,49 @@
+# Reusable acceptance-test workflow: a disposable, UNLICENSED Directus (docker
+# compose) and the full provider acceptance suite. Called by ci.yml (PRs, main)
+# and release.yml (before a tag is published), so a release can never ship a
+# provider that fails acceptance.
+name: Acceptance
+
+on:
+  workflow_call:
+
+permissions:
+  contents: read
+
+jobs:
+  acceptance:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-go@v6
+        with:
+          go-version-file: go.mod
+      # Install Terraform ourselves and point the test framework at it.
+      # Otherwise terraform-plugin-testing downloads the CLI and verifies it
+      # against an embedded HashiCorp GPG key, which fails "openpgp: key expired".
+      - uses: hashicorp/setup-terraform@v4
+        with:
+          terraform_version: "1.12.1"
+          terraform_wrapper: false
+      - name: Start Directus
+        run: docker compose -f docker-compose.test.yml up -d
+      - name: Wait for Directus
+        run: ./scripts/wait-for-directus.sh
+      # Guard: CI must never consume a licence activation.
+      - name: Assert unlicensed
+        run: |
+          src=$(curl -fsS -H "Authorization: Bearer acceptance-admin-token" \
+            http://localhost:8055/server/info | jq -r '.data.license.source')
+          echo "license.source=$src"
+          test "$src" = "null"
+      - name: Acceptance tests
+        env:
+          TF_ACC: "1"
+          DIRECTUS_URL: "http://localhost:8055"
+          DIRECTUS_TOKEN: "acceptance-admin-token"
+        run: |
+          export TF_ACC_TERRAFORM_PATH="$(which terraform)"
+          go test ./internal/provider/... -count=1 -v -timeout 30m
+      - name: Directus logs on failure
+        if: failure()
+        run: docker compose -f docker-compose.test.yml logs directus
