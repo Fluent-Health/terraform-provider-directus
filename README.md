@@ -15,6 +15,7 @@ content items.
 | `directus_collection` | A table, or a group that organises collections in the data model |
 | `directus_field` | A field: its column (unless an alias) and its Data Studio settings |
 | `directus_folder` | A file-library or Flows-module folder |
+| `directus_relation` | A relation: m2o/o2m, the two halves of an m2m, or an m2a |
 
 Full docs are in [`docs/`](./docs/) and on the [Terraform Registry](https://registry.terraform.io/providers/Fluent-Health/directus/latest/docs).
 

@@ -97,6 +97,7 @@ func (p *DirectusProvider) Resources(_ context.Context) []func() resource.Resour
 		NewCollectionResource,
 		NewFieldResource,
 		NewFolderResource,
+		NewRelationResource,
 	}
 }
 

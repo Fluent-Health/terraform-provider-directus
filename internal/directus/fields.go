@@ -168,7 +168,7 @@ func (c *Client) UpdateField(ctx context.Context, collection, field string, body
 func (c *Client) DeleteField(ctx context.Context, collection, field string) error {
 	err := c.do(ctx, "DELETE", fieldsPath+"/"+url.PathEscape(collection)+"/"+url.PathEscape(field), nil, nil, nil)
 	c.invalidateSchema()
-	return goneOn403(ctx, err, func(ctx context.Context) error {
+	return goneIfAbsent(ctx, err, func(ctx context.Context) error {
 		_, err := c.GetField(ctx, collection, field)
 		return err
 	})

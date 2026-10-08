@@ -144,7 +144,7 @@ func (c *Client) DeleteCollection(ctx context.Context, name string) error {
 	err := c.do(ctx, "DELETE", collectionsPath+"/"+url.PathEscape(name), nil, nil, nil)
 	c.invalidateSchema()
 	// Already gone (deleted outside Terraform) is success.
-	err = goneOn403(ctx, err, func(ctx context.Context) error {
+	err = goneIfAbsent(ctx, err, func(ctx context.Context) error {
 		_, err := c.GetCollection(ctx, name)
 		return err
 	})
