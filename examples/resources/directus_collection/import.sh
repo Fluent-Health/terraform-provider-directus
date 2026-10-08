@@ -1,0 +1,1 @@
+terraform import directus_collection.articles articles

@@ -12,6 +12,7 @@ content items.
 
 | Resource | Purpose |
 |---|---|
+| `directus_collection` | A table, or a group that organises collections in the data model |
 | `directus_folder` | A file-library or Flows-module folder |
 
 Full docs are in [`docs/`](./docs/) and on the [Terraform Registry](https://registry.terraform.io/providers/Fluent-Health/directus/latest/docs).

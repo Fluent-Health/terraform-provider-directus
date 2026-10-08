@@ -65,6 +65,21 @@ func NewClient(baseURL, token string, opts ...Option) *Client {
 // a real permission error and is returned as such.
 var ErrNotFound = errors.New("directus: object not found")
 
+// goneOn403 resolves a 403 from a write against a missing object (Directus'
+// "not found") into nil when a fresh listing confirms the object is absent, and
+// otherwise returns err unchanged: a 403 for an object that IS listed is a real
+// permission error. exists must read through the (just invalidated) cache.
+func goneOn403(ctx context.Context, err error, exists func(context.Context) error) error {
+	var ae *APIError
+	if !errors.As(err, &ae) || ae.StatusCode != http.StatusForbidden {
+		return err
+	}
+	if lookup := exists(ctx); IsNotFound(lookup) {
+		return nil
+	}
+	return err
+}
+
 // IsNotFound reports whether err means the object does not exist.
 func IsNotFound(err error) bool {
 	return errors.Is(err, ErrNotFound)

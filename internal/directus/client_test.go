@@ -205,3 +205,51 @@ func TestDeleteFolder_AnnotatesForeignKeyViolation(t *testing.T) {
 		t.Fatalf("err = %v, want the referenced hint", err)
 	}
 }
+
+// A 403 on DELETE of an object that no fresh listing contains is "already
+// gone" (success); a 403 for an object that IS listed is a permission error.
+func TestDeleteCollection_403MeansGoneOnlyWhenUnlisted(t *testing.T) {
+	for _, tc := range []struct {
+		name    string
+		listed  []Collection
+		wantErr bool
+	}{
+		{"absent", []Collection{}, false},
+		{"present", []Collection{{Collection: "articles", Schema: &CollectionSchema{Name: "articles"}}}, true},
+	} {
+		t.Run(tc.name, func(t *testing.T) {
+			srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				if r.Method == http.MethodDelete {
+					w.WriteHeader(http.StatusForbidden)
+					_, _ = w.Write([]byte(`{"errors":[{"message":"You don't have permission to access this.","extensions":{"code":"FORBIDDEN"}}]}`))
+					return
+				}
+				writeData(t, w, tc.listed)
+			}))
+			defer srv.Close()
+
+			err := newTestClient(srv).DeleteCollection(context.Background(), "articles")
+			if (err != nil) != tc.wantErr {
+				t.Fatalf("err = %v, wantErr %v", err, tc.wantErr)
+			}
+		})
+	}
+}
+
+func TestListCollections_ExcludesSystem(t *testing.T) {
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		_, _ = w.Write([]byte(`{"data":[
+			{"collection":"directus_users","meta":{"system":true},"schema":{"name":"directus_users"}},
+			{"collection":"articles","meta":{"hidden":false},"schema":{"name":"articles"}},
+			{"collection":"content","meta":{"collapse":"open"},"schema":null}]}`))
+	}))
+	defer srv.Close()
+
+	got, err := newTestClient(srv).ListCollections(context.Background())
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(got) != 2 || got[0].Collection != "articles" || got[1].Collection != "content" || got[1].Schema != nil {
+		t.Fatalf("got %+v", got)
+	}
+}

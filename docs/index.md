@@ -28,6 +28,9 @@ treat a hidden object as deleted.
   that does not exist. The provider decides an object is gone only when a
   successful listing does not contain it, so a permission problem surfaces as
   an error instead of a plan to recreate everything.
+- **Destroy guard.** Destroying a collection or field drops a table or column and
+  every value in it. Those resources refuse, at plan time, to be destroyed or
+  replaced unless `allow_destroy = true` was applied first.
 - **Retries.** HTTP 429, 502, 503 and 504 are retried with exponential backoff,
   honouring `Retry-After`.
 
