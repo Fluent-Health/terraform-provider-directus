@@ -1,0 +1,22 @@
+# Binaries
+terraform-provider-directus
+dist/
+# Go
+*.test
+coverage.out
+# Terraform
+.terraform/
+*.tfstate
+*.tfstate.*
+.terraform.lock.hcl
+.terraformrc
+terraform.rc
+
+# Security / Secrets
+.env
+*.pem
+*.key
+*.p12
+*.pfx
+service-account*.json
+*-sa-key.json
