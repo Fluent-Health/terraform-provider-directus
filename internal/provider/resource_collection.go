@@ -76,6 +76,7 @@ type CollectionResource struct {
 
 // CollectionResourceModel is the directus_collection state.
 type CollectionResourceModel struct {
+	ID                       types.String         `tfsdk:"id"`
 	Collection               types.String         `tfsdk:"collection"`
 	Table                    types.Bool           `tfsdk:"table"`
 	PrimaryKey               types.Object         `tfsdk:"primary_key"`
@@ -120,6 +121,10 @@ func (r *CollectionResource) Schema(_ context.Context, _ resource.SchemaRequest,
 			"Destroying a table collection drops the table and every row in it, so it is guarded by `allow_destroy`. " +
 			"See the [Directus collections API](https://directus.io/docs/api/collections).",
 		Attributes: map[string]schema.Attribute{
+			"id": schema.StringAttribute{
+				Computed: true, MarkdownDescription: "The collection name, the import ID.",
+				PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
+			},
 			"collection": schema.StringAttribute{
 				Required:            true,
 				MarkdownDescription: "Collection name: the table name for a table collection. Changing it replaces the collection.",
@@ -378,6 +383,7 @@ func (r *CollectionResource) read(ctx context.Context, data *CollectionResourceM
 		return diags
 	}
 
+	data.ID = types.StringValue(c.Collection)
 	data.Table = types.BoolValue(c.Schema != nil)
 	data.PrimaryKey = types.ObjectNull(primaryKeyAttrTypes)
 	if c.Schema != nil {

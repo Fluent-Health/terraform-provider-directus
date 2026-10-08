@@ -92,12 +92,11 @@ resource "directus_collection" "test" {
 				),
 			},
 			{
-				ResourceName:                         "directus_collection.test",
-				ImportState:                          true,
-				ImportStateId:                        name,
-				ImportStateVerify:                    true,
-				ImportStateVerifyIdentifierAttribute: "collection",
-				ImportStateVerifyIgnore:              []string{"allow_destroy"},
+				ResourceName:            "directus_collection.test",
+				ImportState:             true,
+				ImportStateId:           name,
+				ImportStateVerify:       true,
+				ImportStateVerifyIgnore: []string{"allow_destroy"},
 			},
 		},
 	})

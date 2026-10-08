@@ -68,6 +68,10 @@ resource "directus_collection" "articles" {
 - `unarchive_value` (String) Value `archive_field` is set to when an item is unarchived.
 - `versioning` (Boolean) Enable content versioning. Defaults to `false`.
 
+### Read-Only
+
+- `id` (String) The collection name, the import ID.
+
 <a id="nestedatt--primary_key"></a>
 ### Nested Schema for `primary_key`
 

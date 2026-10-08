@@ -61,6 +61,7 @@ type FieldResource struct {
 
 // FieldResourceModel is the directus_field state.
 type FieldResourceModel struct {
+	ID         types.String `tfsdk:"id"`
 	Collection types.String `tfsdk:"collection"`
 	Field      types.String `tfsdk:"field"`
 	Type       types.String `tfsdk:"type"`
@@ -128,6 +129,10 @@ func (r *FieldResource) Schema(_ context.Context, _ resource.SchemaRequest, resp
 			"Do not declare a collection's primary key here; `directus_collection` owns it. " +
 			"See the [Directus fields API](https://directus.io/docs/api/fields).",
 		Attributes: map[string]schema.Attribute{
+			"id": schema.StringAttribute{
+				Computed: true, MarkdownDescription: "`<collection>.<field>`, the import ID.",
+				PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
+			},
 			"collection": schema.StringAttribute{
 				Required: true, MarkdownDescription: "Collection the field belongs to. Changing it replaces the field.",
 				PlanModifiers: []planmodifier.String{stringplanmodifier.RequiresReplace()},
@@ -481,6 +486,7 @@ func (r *FieldResource) read(ctx context.Context, data *FieldResourceModel) (dia
 		return diags
 	}
 
+	data.ID = types.StringValue(f.Collection + "." + f.Field)
 	data.Type = types.StringValue(f.Type)
 	if s := f.Schema; s != nil {
 		data.DefaultValue = jsonFromRaw(s.DefaultValue)

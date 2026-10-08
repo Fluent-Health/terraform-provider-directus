@@ -84,6 +84,7 @@ resource "directus_field" "seo_title" {
 - `data_type` (String) Database column type, e.g. `character varying`.
 - `foreign_key_column` (String) Column a foreign key on this column points at; set by a `directus_relation`.
 - `foreign_key_table` (String) Table a foreign key on this column points at; set by a `directus_relation`.
+- `id` (String) `<collection>.<field>`, the import ID.
 
 ## Import
 

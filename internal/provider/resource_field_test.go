@@ -271,12 +271,11 @@ func TestAccField_roundTrip(t *testing.T) {
 
 func testAccFieldImportStep(name, coll string) resource.TestStep {
 	return resource.TestStep{
-		ResourceName:                         "directus_field." + name,
-		ImportState:                          true,
-		ImportStateId:                        coll + "." + name,
-		ImportStateVerify:                    true,
-		ImportStateVerifyIdentifierAttribute: "field",
-		ImportStateVerifyIgnore:              []string{"allow_destroy"},
+		ResourceName:            "directus_field." + name,
+		ImportState:             true,
+		ImportStateId:           coll + "." + name,
+		ImportStateVerify:       true,
+		ImportStateVerifyIgnore: []string{"allow_destroy"},
 	}
 }
 
