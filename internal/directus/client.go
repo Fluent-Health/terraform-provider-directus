@@ -65,6 +65,23 @@ func NewClient(baseURL, token string, opts ...Option) *Client {
 // a real permission error and is returned as such.
 var ErrNotFound = errors.New("directus: object not found")
 
+// goneIfAbsent resolves the error from a DELETE of a missing object into nil
+// when a fresh listing confirms the object is absent, and otherwise returns err
+// unchanged. Directus reports a missing object as 403 (items, collections,
+// fields) or as 400 INVALID_PAYLOAD (a relation whose field is already gone);
+// either one for an object that IS listed is a real error. exists must read
+// through the (just invalidated) cache.
+func goneIfAbsent(ctx context.Context, err error, exists func(context.Context) error) error {
+	var ae *APIError
+	if !errors.As(err, &ae) || (ae.StatusCode != http.StatusForbidden && ae.StatusCode != http.StatusBadRequest) {
+		return err
+	}
+	if lookup := exists(ctx); IsNotFound(lookup) {
+		return nil
+	}
+	return err
+}
+
 // IsNotFound reports whether err means the object does not exist.
 func IsNotFound(err error) bool {
 	return errors.Is(err, ErrNotFound)

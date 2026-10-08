@@ -62,6 +62,16 @@ func (c *Client) list(ctx context.Context, path string) (json.RawMessage, error)
 	return e.data, e.err
 }
 
+// invalidateSchema drops every data-model listing. A schema write reaches
+// beyond its own kind: deleting a collection removes its fields and relations
+// (and other collections' o2m/m2o fields pointing at it), deleting a field
+// removes its relation, and creating a collection creates its primary key.
+func (c *Client) invalidateSchema() {
+	c.invalidate(collectionsPath)
+	c.invalidate(fieldsPath)
+	c.invalidate(relationsPath)
+}
+
 // invalidate drops the cached listing for path.
 func (c *Client) invalidate(path string) {
 	c.cache.mu.Lock()
