@@ -64,3 +64,7 @@ See [CONTRIBUTING.md](./CONTRIBUTING.md).
 ## License
 
 [Apache 2.0](./LICENSE)
+
+---
+
+Built and maintained by [Fluent Health](https://github.com/Fluent-Health).
