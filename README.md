@@ -5,8 +5,8 @@ schema, access control, folders, flows, dashboards and settings an
 administrator otherwise clicks together in the Data Studio. It does not manage
 content items.
 
-> **Status: early.** v0.1 ships the provider foundation (client, read cache,
-> retries, acceptance stack) and one resource. More resources follow.
+> **Status: early.** v0.1 covers the data model (collections, fields,
+> relations) and folders. Access control, flows, dashboards and settings follow.
 
 ## Resources
 
